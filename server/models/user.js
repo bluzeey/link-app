@@ -1,7 +1,9 @@
-const mongoose=require('mongoose')
-const crypto=require('crypto')
+const mongoose= require('mongoose')
+const crypto= require('crypto')
 
-const userSchema=new mongoose.Schema({
+const {Schema}= mongoose;
+
+const userSchema=new Schema({
   username:{
     type:String,
     trim:true,
@@ -35,11 +37,11 @@ const userSchema=new mongoose.Schema({
     default:'subscriber'
   },
   resetPasswordLink:{
-    data: String,
-    default: ''
+    type: String,
+    default: 'placeholderlinks' 
   }
-}, {timestamps: true}
-)
+}, {timestamps: true});
+
 // virtual fields
 userSchema.virtual('password').set(function(password){
     this._password=password
@@ -48,6 +50,7 @@ userSchema.virtual('password').set(function(password){
 }).get(function(){
     return this._password
 })
+
 //methods 
 userSchema.methods={
     authenticate:function(plainText){
@@ -55,7 +58,7 @@ userSchema.methods={
     },
     encryptPassword: function(password){
         if(!password){
-            return ;
+            return '';
         }
         try {
             return crypto.createHmac('sha1',this.salt).update(password).digest('hex')
@@ -67,4 +70,5 @@ userSchema.methods={
         return Math.round(new Date().valueOf() * Math.random()) + ''
     }
 }
-module.exports=mongoose.model(userSchema)
+
+module.exports=mongoose.model('User', userSchema) 
